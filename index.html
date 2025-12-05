@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>勇闖挑戰｜GUANDO GO!</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --brown-text: #4a2c00;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        font-family: "Zen Maru Gothic", "Noto Sans TC", sans-serif;
+        color: var(--brown-text);
+        overflow-x: hidden;
+    }
+
+    /* 整體底色，避免載入前閃白 */
+    body {
+        background: #f6e07a;
+        position: relative;
+    }
+
+    /* 模糊背景：只負責鋪滿顏色、消除色差 */
+    .bg-blur {
+        position: fixed;
+        inset: 0;
+        background: url("2400.jpg") center top / cover no-repeat;
+        filter: blur(14px) brightness(1.05);
+        transform: scale(1.1);
+        z-index: -2;
+    }
+
+    /* 主視覺：清楚版本，依原比例顯示 */
+    .bg-main {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        max-width: 768px;             /* 主視覺最大寬度，可再調 */
+        aspect-ratio: 1080 / 2400;     /* 依你的背景圖比例調整 */
+        background: url("2400.jpg") center top / contain no-repeat;
+        z-index: -1;
+        pointer-events: none;
+    }
+
+    /* 內容外框（像一支置中的手機） */
+    .wrapper {
+        max-width: 520px;
+        margin: 0 auto;
+        padding: 140px 16px 60px;  /* 上方空間留給主視覺標題區 */
+        position: relative;
+        z-index: 1;
+    }
+
+    h1 {
+        text-align: center;
+        font-size: 30px;
+        margin: 0 0 6px;
+        font-weight: 700;
+        letter-spacing: 1px;
+    }
+
+    .sub {
+        text-align: center;
+        font-size: 14px;
+        margin-bottom: 22px;
+        font-weight: 700;
+        opacity: 0.9;
+        letter-spacing: 2px;
+    }
+
+    button {
+        width: 100%;
+        padding: 14px;
+        margin-top: 15px;
+        background: linear-gradient(#ffdf7f, #ffbd4b);
+        border: none;
+        border-radius: 12px;
+        font-size: 17px;
+        font-weight: 700;
+        color: #4a2c00;
+        cursor: pointer;
+        box-shadow: 0 4px 10px #00000030;
+    }
+
+    .card {
+        background: #ffffffee;
+        border-radius: 22px;
+        padding: 22px 20px;
+        margin-top: 18px;
+        box-shadow: 0 6px 16px #00000030;
+        display: none;
+    }
+    .card.active { display: block; }
+
+    .wood-sign {
+        background: #dcb980;
+        border: 3px solid #8b5a2b;
+        border-radius: 10px;
+        padding: 10px 18px;
+        display: inline-block;
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 12px;
+    }
+
+    .question {
+        font-size: 16px;
+        font-weight: 700;
+        margin-bottom: 12px;
+        line-height: 1.6;
+    }
+
+    input[type="text"] {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #d6b067;
+        border-radius: 10px;
+        font-size: 16px;
+    }
+
+    .result {
+        margin-top: 10px;
+        font-size: 15px;
+        font-weight: 700;
+        min-height: 20px;
+    }
+
+    /* 平板以上：多留一點上方空間，主視覺露多一點 */
+    @media (min-width: 768px) {
+        .wrapper {
+            padding-top: 180px;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .wrapper {
+            max-width: 560px;
+            padding-top: 220px;
+        }
+        .bg-main {
+            max-width: 820px;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="bg-blur"></div>
+<div class="bg-main"></div>
+
+<div class="wrapper">
+    <h1>勇闖挑戰 GUANDO GO!</h1>
+    <div class="sub">文化探索 × 自我實踐</div>
+
+    <button id="startBtn" onclick="startGame()">開始闖關</button>
+
+        <!-- ✦ 關卡 1 -->
+        <div class="card" id="card1">
+            <div class="wood-sign">關卡 1｜土地的庇護・福德正殿</div>
+            <p>請移步至福德正殿，觀察土地公神像手中的象徵物，了解祂帶來庇佑與財福的含義。
+            請依提示作答，答對才能解鎖下一關。</p>
+            <p>提示：土地公手持象徵財富與守護的物品。</p>
+            <p class="question">問題：土地公手中的象徵物有哪些？請寫出你觀察到的物件名稱。</p>
+            <input id="ans1" type="text" placeholder="請輸入你的答案…">
+            <button onclick="checkAnswer('ans1', ['元寶','拐杖'], 'card2', 'card1')">提交答案</button>
+            <div class="result" id="ans1-result"></div>
+        </div>
+
+        <!-- ✦ 關卡 2 -->
+        <div class="card" id="card2">
+            <div class="wood-sign">關卡 2｜財運之路・財神洞</div>
+            <p>請移步至財神洞，觀察天官大帝手持的卷軸字樣，確認其祈福寓意。
+            請依提示作答，答對才能解鎖下一關。</p>
+            <p>提示：卷軸上的文字為天官最常見的祈福語。</p>
+            <p class="question">問題：天官大帝手中卷軸所書寫的祈福語為何？請寫出卷軸上的字句。</p>
+            <input id="ans2" type="text" placeholder="請輸入你的答案…">
+            <button onclick="checkAnswer('ans2', ['天官賜福'], 'card3', 'card2')">提交答案</button>
+            <div class="result" id="ans2-result"></div>
+        </div>
+
+        <!-- ✦ 關卡 3 -->
+        <div class="card" id="card3">
+            <div class="wood-sign">關卡 3｜千手千眼・千手觀音</div>
+            <p>請移步至千手觀音正殿，觀察千手觀音神像所呈現的手數，理解其象徵的救苦救難力量。
+            請依提示作答，答對才能解鎖下一關。</p>
+            <p>提示：此手數為象徵性的固定設計，並非真正的千隻。</p>
+            <p class="question">問題：千手觀音聖像呈現的象徵性手數為多少？寫出實際觀察到的手數</p>
+            <input id="ans3" type="text" placeholder="請輸入你的答案…">
+            <button onclick="checkAnswer('ans3', ['24','24隻'], 'card4', 'card3')">提交答案</button>
+            <div class="result" id="ans3-result"></div>
+        </div>
+
+
+    <!-- 關卡 4 -->
+    <div class="card" id="card4">
+        <div class="wood-sign">關卡 4｜勇氣起點・延平郡王三將軍廟</div>
+        <p>請前往三將軍神像前，觀察三位武將的姿態與手持物，找出他們護衛延平郡王的象徵。
+        請依提示作答，答對才能解鎖下一關。</p>
+        <p>提示：武將守護延平郡王，他們的手上必定是作戰用的器物。</p>
+        <p class="question">問題：三將軍手中的武將配備為何？請寫出你觀察到的配備名稱或種類。</p>
+        <input id="ans4" type="text" placeholder="請輸入你的答案…">
+        <button onclick="checkAnswer('ans4', ['刀','劍','槍','武器','兵器'], 'card5', 'card4')">提交答案</button>
+        <div class="result" id="ans4-result"></div>
+    </div>
+
+   <!-- 關卡 5 -->
+    <div class="card" id="card5">
+        <div class="wood-sign">關卡 5｜智慧的守護者・文昌帝君殿</div>
+        <p>請移步至文昌帝君廟，查看神龕上方的匾額，注意匾額上題寫的文字與其象徵的品德意涵。
+        請依提示作答，答對才能解鎖下一關。</p>
+        <p>提示：匾額內容通常與文運與德行有關。</p>
+        <p class="question">問題：文昌帝君神龕上方匾額題寫的文字為何？請完整寫出匾額文字。</p>
+        <input id="ans5" type="text" placeholder="請輸入你的答案…">
+        <button onclick="checkAnswer('ans5', ['孝友文章'], 'card6', 'card5')">提交答案</button>
+        <div class="result" id="ans5-result"></div>
+    </div>
+  
+  <!-- ✦ 關卡 6 -->
+        <div class="card" id="card6">
+            <div class="wood-sign">關卡 6｜海上的守護・媽祖殿</div>
+            <p>請至媽祖神桌前，觀察神桌下所放置的守護神像，並辨認其象徵角色。
+            請依提示作答，答對才能解鎖下一關。</p>
+            <p>提示：注意神桌正下方的固定小神像。</p>
+            <p class="question">問題：媽祖神桌下方鎮守殿內的守護神是哪一位？請寫出守護神名稱。</p>
+            <input id="ans6" type="text" placeholder="請輸入你的答案…">
+            <button onclick="checkAnswer('ans6', ['虎爺','虎將軍'], 'card7', 'card6')">提交答案</button>
+            <div class="result" id="ans6-result"></div>
+        </div>
+        
+        <!-- ✦ 關卡 7 -->
+        <div class="card" id="card7">
+            <div class="wood-sign">關卡 7｜天上界・凌霄寶殿</div>
+            <p>請至凌霄寶殿，觀察龍柱或龍的表情、姿態與身體細節，思考龍在傳統文化中的象徵意義。請依觀察結果回答問題。請移步至凌霄寶殿五樓，仔細觀察殿內樑柱上的雕刻圖案，辨識圖中出現的神獸。
+            請依提示作答，答對才能解鎖下一關。</p>
+            <p>提示：天界主殿常以象徵至尊的神獸作為雕刻。</p>
+            <p class="question">問題：凌霄寶殿樑柱上雕刻的動物為何？請寫出神獸名稱。</p>
+            <input id="ans7" type="text" placeholder="請輸入你的答案…">
+            <button onclick="checkAnswer('ans7', ['龍'], 'final', 'card7')">提交答案</button>
+            <div class="result" id="ans7-result"></div>
+        </div>
+        <!-- ✦ 最終卡片 -->
+        <div class="card" id="final">
+            <div class="wood-sign">恭喜完成挑戰！</div>
+            <p class="question" style="text-align:center;">請向工作人員出示此畫面 🎉</p>
+        </div>
+
+    
+</div>
+
+<script>
+function startGame() {
+    const firstCard = document.getElementById("card1");
+    firstCard.classList.add("active");
+    document.getElementById("startBtn").style.display = "none";
+    firstCard.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function checkAnswer(inputId, keywords, nextId, hideId) {
+    const inputEl = document.getElementById(inputId);
+    const input = inputEl.value.trim();
+    const resultBox = document.getElementById(inputId + "-result");
+
+    if (!input) {
+        resultBox.style.color = "#c62828";
+        resultBox.innerHTML = "請先輸入你的想法再提交喔！";
+        inputEl.focus();
+        return;
+    }
+
+    const isCorrect = keywords.some(k => input.includes(k));
+
+    if (isCorrect) {
+        resultBox.style.color = "#0d8b00";
+        resultBox.innerHTML = "✔ 太棒了！一起前往下一關！";
+
+        const nextCard = document.getElementById(nextId);
+        nextCard.classList.add("active");
+        if (hideId) document.getElementById(hideId).style.display = "none";
+
+        setTimeout(() => {
+            nextCard.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 400);
+    } else {
+        resultBox.style.color = "#c62828";
+        resultBox.innerHTML = "✘ 再想一想！試著回想剛剛看到的線索～";
+    }
+}
+</script>
+
+</body>
+</html>
